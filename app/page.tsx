@@ -23,6 +23,11 @@ export default function HomePage() {
     };
 
     fetchConfigs();
+
+    // Добавляем интервал обновления
+    const interval = setInterval(fetchConfigs, 3000);
+
+    return () => clearInterval(interval);
   }, [updateTrigger]);
 
   return (
