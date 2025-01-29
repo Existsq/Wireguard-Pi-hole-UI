@@ -74,7 +74,10 @@ export default function ServerList({ viewMode }: Layout) {
         data.length > 0 ? (
           data.map((server: ServerData) => (
             <div key={server.name}>
-              <ServerCard {...server} />
+              <ServerCard 
+                {...server} 
+                onUpdate={fetchServerData}
+              />
             </div>
           ))
         ) : (

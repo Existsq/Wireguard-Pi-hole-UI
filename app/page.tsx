@@ -11,16 +11,19 @@ interface Config {
 
 export default function HomePage() {
   const [configs, setConfigs] = useState<Config[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   useEffect(() => {
     const fetchConfigs = async () => {
-      const response = await fetch('/api/servers');
+      const response = await fetch('/api/servers', {
+        cache: 'no-store'
+      });
       const data = await response.json();
       setConfigs(data);
     };
 
     fetchConfigs();
-  }, []);
+  }, [updateTrigger]);
 
   return (
     <div className="min-h-screen">
@@ -31,6 +34,7 @@ export default function HomePage() {
             name={config.name}
             address={config.address}
             dns={config.dns}
+            onUpdate={() => setUpdateTrigger(prev => prev + 1)}
           />
         ))}
       </div>

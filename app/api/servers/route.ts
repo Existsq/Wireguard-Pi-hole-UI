@@ -29,7 +29,7 @@ export async function GET() {
             const dnsMatch = configContent.match(/DNS\s*=\s*([^\n]+)/);
             
             const fullAddress = addressMatch ? addressMatch[1].trim() : '';
-            const maskedAddress = fullAddress.slice(0, -3);
+            const maskedAddress = fullAddress.slice(0, -3)
             
             return {
               name,

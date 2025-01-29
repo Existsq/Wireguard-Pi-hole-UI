@@ -80,6 +80,7 @@ interface ServerCardProps {
   name: string;
   address: string;
   dns: string;
+  onUpdate: () => void;
 }
 
 export function ServerCard(props: ServerCardProps) {
@@ -175,7 +176,7 @@ export function ServerCard(props: ServerCardProps) {
 
       setServerName(newName.trim());
       setIsRenameDialogOpen(false);
-      window.location.reload();
+      props.onUpdate();
 
     } catch (error) {
       toast({
