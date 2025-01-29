@@ -3,6 +3,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 
+// Отключаем кэширование для этого маршрута
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface ServerConfig {
   name: string;
   address: string;
