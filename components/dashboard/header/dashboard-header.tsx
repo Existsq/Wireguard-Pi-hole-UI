@@ -65,8 +65,8 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="sticky top-0 flex h-fit pt-4 items-center border bg-background z-[100] mx-6 mt-6 rounded-md">
-      <nav className="grid grid-cols-2 gap-2 text-lg font-medium px-4 w-full">
+    <header className="sticky top-0 flex h-fit items-center border bg-background z-[100] mx-6 mt-6 rounded-md">
+      <nav className="grid grid-cols-2 gap-2 text-lg font-medium p-4 w-full space-y-1">
       <Button 
           className="w-full col-span-2" 
           variant="default"
