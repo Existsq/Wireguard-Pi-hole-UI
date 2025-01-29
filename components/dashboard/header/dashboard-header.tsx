@@ -66,19 +66,19 @@ export default function DashboardHeader() {
 
   return (
     <header className="sticky top-0 flex h-[70px] w- items-center border bg-background z-[100] mx-6 mt-6 rounded-md">
-      <nav className="flex w-full justify-between gap-2 text-lg font-medium px-4">
-        <Button 
-          className="w-full" 
-          variant="default"
-          onClick={() => setIsCreateDialogOpen(true)}
-        >
-          Create new
-        </Button>
+      <nav className="grid grid-cols-2 gap-2 text-lg font-medium px-4 w-full">
         <Button variant="secondary" className="w-full">
           Export profiles
         </Button>
         <Button variant="secondary" className="w-full">
           Import profiles
+        </Button>
+        <Button 
+          className="w-full col-span-2" 
+          variant="default"
+          onClick={() => setIsCreateDialogOpen(true)}
+        >
+          Create new
         </Button>
       </nav>
 

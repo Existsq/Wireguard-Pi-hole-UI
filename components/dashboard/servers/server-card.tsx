@@ -229,7 +229,7 @@ export function ServerCard(props: ServerCardProps) {
 
   return (
     <>
-      <Card className="transform transition-transform duration-300 ease-in-out hover:scale-[1.01]">
+      <Card className="transform transition-transform duration-300 ease-in-out hover:scale-[1.01] mx-auto">
         <CardHeader className="flex-row items-center justify-between">
           <div className="flex items-center">
             <CardTitle>{props.name}</CardTitle>
