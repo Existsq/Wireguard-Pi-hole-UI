@@ -110,6 +110,7 @@ export function ServerCard(props: ServerCardProps) {
       const data = await response.json();
       setQrCode(data.qrCode);
       setIsQrDialogOpen(true);
+      props.onUpdate();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -134,12 +135,51 @@ export function ServerCard(props: ServerCardProps) {
         description: "Конфигурация успешно удалена"
       });
 
-      router.refresh();
+      props.onUpdate();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Ошибка",
         description: "Не удалось удалить конфигурацию"
+      });
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(`/api/download/${props.name}/${props.name}.conf`);
+      
+      if (!response.ok) {
+        const data = await response.json();
+        toast({
+          variant: "destructive",
+          title: "Ошибка",
+          description: data.error || 'Ошибка при скачивании конфигурации'
+        });
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${props.name}.conf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Успешно",
+        description: "Конфигурация успешно скачана"
+      });
+
+      props.onUpdate();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка",
+        description: "Ошибка при скачивании конфигурации"
       });
     }
   };
@@ -176,7 +216,7 @@ export function ServerCard(props: ServerCardProps) {
 
       setServerName(newName.trim());
       setIsRenameDialogOpen(false);
-      props.onUpdate();
+      window.location.reload();
 
     } catch (error) {
       toast({
@@ -207,42 +247,7 @@ export function ServerCard(props: ServerCardProps) {
           </Button>
           <Button 
             variant="secondary"
-            onClick={async () => {
-              try {
-                const response = await fetch(`/api/download/${props.name}/${props.name}.conf`);
-                
-                if (!response.ok) {
-                  const data = await response.json();
-                  toast({
-                    variant: "destructive",
-                    title: "Ошибка",
-                    description: data.error || 'Ошибка при скачивании конфигурации'
-                  });
-                  return;
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${props.name}.conf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
-                
-                toast({
-                  title: "Успешно",
-                  description: "Конфигурация успешно скачана"
-                });
-              } catch (error) {
-                toast({
-                  variant: "destructive",
-                  title: "Ошибка",
-                  description: "Ошибка при скачивании конфигурации"
-                });
-              }
-            }}
+            onClick={handleDownload}
           >
             <Download size={22} />
             

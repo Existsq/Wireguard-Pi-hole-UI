@@ -1,7 +1,7 @@
 'use client';
 
 import { ServerCard } from "@/components/dashboard/servers/server-card"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface Config {
   name: string;
@@ -11,24 +11,30 @@ interface Config {
 
 export default function HomePage() {
   const [configs, setConfigs] = useState<Config[]>([]);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
 
-  useEffect(() => {
-    const fetchConfigs = async () => {
+  const fetchConfigs = useCallback(async () => {
+    try {
       const response = await fetch('/api/servers', {
-        cache: 'no-store'
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
+      if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       setConfigs(data);
-    };
+    } catch (error) {
+      console.error('Error fetching configs:', error);
+    }
+  }, []);
 
+  // Начальная загрузка и периодическое обновление
+  useEffect(() => {
     fetchConfigs();
-
-    // Добавляем интервал обновления
-    const interval = setInterval(fetchConfigs, 3000);
-
+    const interval = setInterval(fetchConfigs, 2000);
     return () => clearInterval(interval);
-  }, [updateTrigger]);
+  }, [fetchConfigs]);
 
   return (
     <div className="min-h-screen">
@@ -39,7 +45,7 @@ export default function HomePage() {
             name={config.name}
             address={config.address}
             dns={config.dns}
-            onUpdate={() => setUpdateTrigger(prev => prev + 1)}
+            onUpdate={fetchConfigs}
           />
         ))}
       </div>
