@@ -19,9 +19,6 @@ export async function GET() {
       .filter(dirent => dirent.isDirectory())
       .map(dirent => ({
         name: dirent.name,
-        owner: "local",
-        members: "1",
-        hasPremium: false,
         address: "local",
         dns: "local"
       }));

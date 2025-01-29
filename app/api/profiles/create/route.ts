@@ -7,6 +7,9 @@ import fs from 'fs/promises';
 
 const execAsync = promisify(exec);
 
+/**
+ * Получает публичный ключ сервера из файла
+ */
 async function getServerPublicKey() {
   const publicKeyPath = path.join(os.homedir(), '/../etc/wireguard/publickey');
   try {
@@ -17,6 +20,9 @@ async function getServerPublicKey() {
   }
 }
 
+/**
+ * Генерирует пару ключей для клиента
+ */
 async function generateKeys() {
   const { stdout: privateKey } = await execAsync('wg genkey');
   const { stdout: publicKey } = await execAsync(`echo "${privateKey.trim()}" | wg pubkey`);
@@ -26,6 +32,9 @@ async function generateKeys() {
   };
 }
 
+/**
+ * Находит следующий свободный IP адрес
+ */
 async function findNextAvailableIP() {
   const basePath = path.join(os.homedir(), '/../etc/wireguard/client');
   const baseIP = '192.168.15.';
@@ -62,6 +71,9 @@ async function findNextAvailableIP() {
   }
 }
 
+/**
+ * Обработчик POST запроса для создания нового профиля
+ */
 export async function POST(request: Request) {
   try {
     const { profileName } = await request.json();
@@ -75,6 +87,7 @@ export async function POST(request: Request) {
 
     const dirPath = path.join(os.homedir(), '/../etc/wireguard/client', profileName);
     const configPath = path.join(dirPath, `${profileName}.conf`);
+    const publicKeyPath = path.join(dirPath, 'publickey'); // Путь для сохранения публичного ключа
 
     // Проверяем, не существует ли уже такой профиль
     try {
@@ -110,9 +123,10 @@ Endpoint = 80.76.43.102:51194
 PersistentKeepalive = 25
 `;
 
-    // Создаем директорию и файл конфигурации через sudo
+    // Создаем директорию и файлы через sudo
     await execAsync(`sudo mkdir -p "${dirPath}"`);
     await execAsync(`sudo bash -c 'echo "${config}" > "${configPath}"'`);
+    await execAsync(`sudo bash -c 'echo "${publicKey}" > "${publicKeyPath}"'`); // Сохраняем публичный ключ
 
     // Добавляем пир в конфигурацию WireGuard
     await execAsync(`sudo wg set wg0 peer "${publicKey}" persistent-keepalive 25 allowed-ips "${ipWithoutMask}"`);
