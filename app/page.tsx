@@ -38,7 +38,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="p-6 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="px-6 pt-4 pb-16 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {configs.map((config) => (
           <ServerCard
             key={config.name}

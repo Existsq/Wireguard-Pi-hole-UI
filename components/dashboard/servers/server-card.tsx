@@ -8,17 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import React, { useState, useEffect } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, QrCodeIcon, CopyIcon, Download, Trash2 } from "lucide-react";
+import { QrCodeIcon, Download, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ModalOpenerButton from "./modal-button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -229,25 +221,26 @@ export function ServerCard(props: ServerCardProps) {
 
   return (
     <>
-      <Card className="transform transition-transform duration-300 ease-in-out hover:scale-[1.01] mx-auto">
+      <Card className="transform transition-transform duration-300 ease-in-out hover:scale-[1.01]">
         <CardHeader className="flex-row items-center justify-between">
           <div className="flex items-center">
             <CardTitle>{props.name}</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 grid-rows-1 gap-4 pb-4 text-lg">
+        <CardContent className="grid grid-cols-2 grid-rows-1 gap-4 pb-4 text-lg md:grid-cols-1">
           <ServerCardSummary value={props.address} label="IP address" />
           <ServerCardSummary value={props.dns} label="DNS" />
         </CardContent>
-        <CardFooter className="flex items-center justify-between gap-4">
 
-
-          <Button variant="secondary" onClick={handleShowQrCode}>
-            <QrCodeIcon size={22} />
-          </Button>
+        <CardFooter className="items-center justify-between gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1">
+          <div className="flex items-center gap-2 w-full justify-between">
+            <Button variant="secondary" onClick={handleShowQrCode} className="w-full">
+              <QrCodeIcon size={22} />
+            </Button>
           <Button 
             variant="secondary"
             onClick={handleDownload}
+            className="w-full"
           >
             <Download size={22} />
             
@@ -255,9 +248,12 @@ export function ServerCard(props: ServerCardProps) {
           <Button 
             variant="secondary" 
             onClick={() => setIsDeleteDialogOpen(true)}
+            className="w-full"
           >
             <Trash2 size={22} />
           </Button>
+          </div>
+          <div className="md:grid-cols-1">
           <Button 
             variant="outline" 
             className="w-full"
@@ -265,6 +261,7 @@ export function ServerCard(props: ServerCardProps) {
           >
             Переименовать
           </Button>
+          </div>
         </CardFooter>
       </Card>
 
