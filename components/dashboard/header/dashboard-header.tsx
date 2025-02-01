@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ export default function DashboardHeader() {
   const [newProfileName, setNewProfileName] = useState('');
   const { toast } = useToast();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreate = async () => {
     if (!newProfileName.trim()) {
@@ -64,22 +65,98 @@ export default function DashboardHeader() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await fetch('/api/export', {
+        method: 'GET',
+      });
+
+      if (!response.ok) throw new Error('Ошибка при экспорте');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'wg0.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Успешно",
+        description: "Конфигурации экспортированы"
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка",
+        description: "Не удалось экспортировать конфигурации"
+      });
+    }
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Ошибка при импорте');
+
+      toast({
+        title: "Успешно",
+        description: "Конфигурации импортированы"
+      });
+      
+      window.location.reload();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка",
+        description: "Не удалось импортировать конфигурации"
+      });
+    }
+  };
+
   return (
     <header className="sticky top-0 flex h-fit items-center border bg-background z-[100] mx-6 mt-6 rounded-md">
       <nav className="grid grid-cols-2 gap-2 text-lg font-medium p-4 w-full space-y-1">
-      <Button 
+        <Button 
           className="w-full col-span-2" 
           variant="default"
           onClick={() => setIsCreateDialogOpen(true)}
         >
           Create new
         </Button>
-        <Button variant="secondary" className="w-full">
+        <Button 
+          variant="secondary" 
+          className="w-full"
+          onClick={handleExport}
+        >
           Export profiles
         </Button>
-        <Button variant="secondary" className="w-full">
+        <Button 
+          variant="secondary" 
+          className="w-full"
+          onClick={() => fileInputRef.current?.click()}
+        >
           Import profiles
         </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept=".json"
+          onChange={handleImport}
+        />
       </nav>
 
       <AlertDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
