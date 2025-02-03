@@ -29,9 +29,8 @@ export async function GET() {
         const peerAddress = p.match(/Address\s*=\s*([^\n]+)/)?.[1].trim();
         return peerAddress === `${clientIP}/24`;
       });
-      const publicKey = peer 
-        ? peer.match(/PublicKey\s*=\s*([^\n]+)/)?.[1].trim() 
-        : '';
+      const publicKeyPath = path.join(clientPath, name, 'publickey');
+      const publicKey = await fs.readFile(publicKeyPath, 'utf-8').then(key => key.trim());
 
       return {
         Name: name,

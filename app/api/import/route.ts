@@ -9,11 +9,11 @@ const execAsync = promisify(exec);
 
 async function getServerIP() {
   try {
-    const { stdout } = await execAsync('curl -s ifconfig.me');
-    return stdout.trim();
+    const { stdout } = await execAsync("curl -4 -s icanhazip.com");
+    return stdout.replace(/[\n\r]/g, '');
   } catch (error) {
-    console.error('Ошибка при получении IP:', error);
-    throw new Error('Не удалось получить IP сервера');
+    console.error('Ошибка при получении IPv4:', error);
+    throw new Error('Не удалось получить IPv4 сервера');
   }
 }
 
@@ -38,7 +38,7 @@ Address = ${config.Address}
 DNS = ${config.DNS}
 
 [Peer]
-PublicKey = ${process.env.SERVER_PUBLIC_KEY}
+PublicKey = ${await fs.readFile(path.join(os.homedir(), '/../etc/wireguard/publickey'), 'utf-8').then(key => key.trim())}
 Endpoint = ${serverIP}:51194
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = ${config.KeepAlive}`;
