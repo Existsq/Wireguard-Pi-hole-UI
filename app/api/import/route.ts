@@ -7,11 +7,22 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+async function getServerIP() {
+  try {
+    const { stdout } = await execAsync('curl -s ifconfig.me');
+    return stdout.trim();
+  } catch (error) {
+    console.error('Ошибка при получении IP:', error);
+    throw new Error('Не удалось получить IP сервера');
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const configs = JSON.parse(await file.text());
+    const serverIP = await getServerIP();
 
     for (const config of configs) {
       const dirPath = path.join(os.homedir(), '/../etc/wireguard/client', config.Name);
@@ -28,7 +39,7 @@ DNS = ${config.DNS}
 
 [Peer]
 PublicKey = ${process.env.SERVER_PUBLIC_KEY}
-Endpoint = ${process.env.SERVER_ENDPOINT}
+Endpoint = ${serverIP}:51194
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = ${config.KeepAlive}`;
 

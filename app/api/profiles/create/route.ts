@@ -7,6 +7,16 @@ import fs from 'fs/promises';
 
 const execAsync = promisify(exec);
 
+async function getServerIP() {
+  try {
+    const { stdout } = await execAsync('curl -s ifconfig.me');
+    return stdout.trim();
+  } catch (error) {
+    console.error('Ошибка при получении IP:', error);
+    throw new Error('Не удалось получить IP сервера');
+  }
+}
+
 /**
  * Получает публичный ключ сервера из файла
  */
@@ -109,6 +119,7 @@ export async function POST(request: Request) {
     // Находим следующий свободный IP
     const ip = await findNextAvailableIP();
     const ipWithoutMask = ip.split('/')[0];
+    const serverIP = await getServerIP();
 
     // Создаем конфигурацию
     const config = `[Interface]
@@ -119,7 +130,7 @@ DNS = 192.168.15.1
 [Peer]
 PublicKey = ${serverPublicKey}
 AllowedIPs = 0.0.0.0/0
-Endpoint = 80.76.43.102:51194
+Endpoint = ${serverIP}:51194
 PersistentKeepalive = 25
 `;
 
