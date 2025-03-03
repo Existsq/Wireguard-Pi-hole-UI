@@ -31,13 +31,13 @@ export async function POST(request: Request) {
     const serverIP = await getServerIP();
     
     // Читаем основной приватный ключ заранее
-    const mainPrivateKeyPath = "/etc/wireguard/privatekey";
+    const mainPublicKeyPath = "/etc/wireguard/publickey";
     let mainPrivateKey = "";
 
     try {
-      mainPrivateKey = (await fs.readFile(mainPrivateKeyPath, "utf-8")).trim();
+      mainPrivateKey = (await fs.readFile(mainPublicKeyPath, "utf-8")).trim();
     } catch (error) {
-      console.error(`Ошибка чтения ${mainPrivateKeyPath}:`, error);
+      console.error(`Ошибка чтения ${mainPublicKeyPath}:`, error);
       return NextResponse.json({ error: "Ошибка чтения основного приватного ключа" }, { status: 500 });
     }
 
@@ -58,20 +58,20 @@ export async function POST(request: Request) {
         // Создаём конфигурационный файл
         const configContent = `[Interface]
 PrivateKey = ${config.PrivateKey}
-Address = ${config.Address}
+Address = ${config.Address}/24
 DNS = ${config.DNS}
 
 [Peer]
-PublicKey = ${mainPrivateKey}
-Endpoint = ${serverIP}:51194
+PublicKey = ${mainPublicKeyPath}
 AllowedIPs = 0.0.0.0/0
+Endpoint = ${serverIP}:51194
 PersistentKeepalive = ${config.KeepAlive}`;
 
         await fs.writeFile(configPath, configContent, { mode: 0o600 });
 
         // Добавляем пир в WireGuard
         await execAsync(
-          `sudo wg set wg0 peer ${config.PrivateKey} allowed-ips ${config.Address} persistent-keepalive ${config.KeepAlive}`
+          `sudo wg set wg0 peer ${config.PublicKey} allowed-ips ${config.Address} persistent-keepalive ${config.KeepAlive}`
         );
       } catch (error) {
         console.error(`Ошибка обработки конфигурации для ${config.Name}:`, error);
