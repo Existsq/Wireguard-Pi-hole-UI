@@ -38,9 +38,8 @@ export async function POST(request: Request) {
       // Создаем директорию
       await execAsync(`sudo mkdir -p "${dirPath}"`);
 
-      // Сохраняем публичный ключ в файл
-      await execAsync(`sudo bash -c 'echo "${config.PublicKey}" > "${publicKeyPath}"`);
-      await execAsync(`sudo bash -c 'echo "${config.PrivateKey}" > "${privateKeyPath}"`);
+      await execAsync(`sudo bash -c 'echo "${config.PublicKey}" > "${publicKeyPath}"'`);
+      await execAsync(`sudo bash -c 'echo "${config.PrivateKey}" > "${privateKeyPath}"'`);
 
 
       // Создаем конфигурационный файл
