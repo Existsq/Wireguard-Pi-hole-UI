@@ -32,10 +32,10 @@ export async function POST(request: Request) {
     
     // Читаем основной приватный ключ заранее
     const mainPublicKeyPath = "/etc/wireguard/publickey";
-    let mainPrivateKey = "";
+    let mainPublicKey = "";
 
     try {
-      mainPrivateKey = (await fs.readFile(mainPublicKeyPath, "utf-8")).trim();
+      mainPublicKey = (await fs.readFile(mainPublicKeyPath, "utf-8")).trim();
     } catch (error) {
       console.error(`Ошибка чтения ${mainPublicKeyPath}:`, error);
       return NextResponse.json({ error: "Ошибка чтения основного приватного ключа" }, { status: 500 });
@@ -62,7 +62,7 @@ Address = ${config.Address}/24
 DNS = ${config.DNS}
 
 [Peer]
-PublicKey = ${mainPublicKeyPath}
+PublicKey = ${mainPublicKey}
 AllowedIPs = 0.0.0.0/0
 Endpoint = ${serverIP}:51194
 PersistentKeepalive = ${config.KeepAlive}`;
