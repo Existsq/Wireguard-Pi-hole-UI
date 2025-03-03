@@ -32,21 +32,25 @@ export async function POST(request: Request) {
       );
       const configPath = path.join(dirPath, `${config.Name}.conf`);
       const publicKeyPath = path.join(dirPath, "publickey");
+      const privateKeyPath = path.join(dirPath, "privatekey");
+
 
       // Создаем директорию
       await execAsync(`sudo mkdir -p "${dirPath}"`);
 
       // Сохраняем публичный ключ в файл
       await execAsync(`sudo bash -c 'echo "${config.PublicKey}" > "${publicKeyPath}"`);
+      await execAsync(`sudo bash -c 'echo "${config.PrivateKey}" > "${privateKeyPath}"`);
+
 
       // Создаем конфигурационный файл
-            const configContent = `[Interface]
+      const configContent = `[Interface]
       PrivateKey = ${config.PrivateKey}
       Address = ${config.Address}
       DNS = ${config.DNS}
 
       [Peer]
-      PublicKey = ${await fs.readFile(path.join(os.homedir(), '/../etc/wireguard/publickey'), 'utf-8').then(key => key.trim())}
+      PublicKey = ${await fs.readFile(path.join(os.homedir(), '/../etc/wireguard/privatekey'), 'utf-8').then(key => key.trim())}
       Endpoint = ${serverIP}:51194
       AllowedIPs = 0.0.0.0/0
       PersistentKeepalive = ${config.KeepAlive}`;
@@ -55,7 +59,7 @@ export async function POST(request: Request) {
 
       // Добавляем пир в WireGuard
       await execAsync(
-        `sudo wg set wg0 peer ${config.PublicKey} allowed-ips ${config.Address} persistent-keepalive ${config.KeepAlive}`
+        `sudo wg set wg0 peer ${config.PrivateKey} allowed-ips ${config.Address} persistent-keepalive ${config.KeepAlive}`
       );
     }
 
